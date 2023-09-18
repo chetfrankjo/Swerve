@@ -84,21 +84,22 @@ public class SwerveMain extends LinearOpMode {
         double c = y - t * (W/R);
         double d = y + t * (W/R);
 
-        double brs = Math.hypot(a, d); //TODO: -0.5 * 2
-        double bls = Math.hypot(a, c);
-        double frs = Math.hypot(b, d);
-        double fls = Math.hypot(b, c);
+        // These values range from 0 to 1... we need it to range from -1 to 1
+        double brs = (Math.hypot(a, d) - 0.5) * 2; //TODO: -0.5 * 2
+        double bls = (Math.hypot(a, c) - 0.5) * 2;
+        double frs = (Math.hypot(b, d) - 0.5) * 2;
+        double fls = (Math.hypot(b, c) - 0.5) * 2;
 
-        double bra = Math.atan2(a, d) / Math.PI;
-        double bla  = Math.atan2(a, c) / Math.PI;
-        double fra  = Math.atan2(b, d) / Math.PI;
-        double fla  = Math.atan2(b, c) / Math.PI;
+        double bra = (Math.atan2(a, d) / Math.PI) * 180; // added multiplication by 180 to return actual degrees (easier for conversion purposes)
+        double bla  = (Math.atan2(a, c) / Math.PI) * 180;
+        double fra  = (Math.atan2(b, d) / Math.PI) * 180;
+        double fla  = (Math.atan2(b, c) / Math.PI) * 180;
 
 
         setMotorSpeeds(brs, bls, frs, fls);
         setServoAngles(bla, bra, fra, fla);
 
-        return bla;
+        return bla; // return a value for debugging
     }
 
     public static void setMotorSpeeds(double brs, double bls, double frs, double fls) {
@@ -115,6 +116,8 @@ public class SwerveMain extends LinearOpMode {
         flc.setPID(p, i, d);
 
         //TODO: do conversion from target angle to analog val
+
+        //TODO: "wrap" the angle back when the range exceeds possibility
 
         bls.setPower(blc.calculate(bli.getVoltage(), bla));
 
