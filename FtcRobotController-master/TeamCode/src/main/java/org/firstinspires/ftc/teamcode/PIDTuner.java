@@ -9,6 +9,12 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+/**
+ * Step 2
+ * This code is needed to tune the PID for the servo movement
+ * The values can be adjusted in FTCDashboard to make tuning easier
+ * the goal is to make the servo reach the desired position quickly with good accuracy
+ */
 @Config
 @TeleOp
 public class PIDTuner extends LinearOpMode {
@@ -28,7 +34,7 @@ public class PIDTuner extends LinearOpMode {
         while (opModeIsActive()) {
             pid.setPID(p, i, d);
 
-            // TODO: convert target to voltage target
+            // TODO: convert target to voltage target (from step 1)
             targetAngle = targetAngle * 0.00;
 
             double output = pid.calculate(input.getVoltage(), targetAngle);

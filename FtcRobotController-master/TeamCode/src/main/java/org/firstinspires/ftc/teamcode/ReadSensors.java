@@ -8,6 +8,10 @@ import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+/**
+ * step 1 for swerve is to figure out how each motor/servo/encoder behaves
+ * this code helps with that by allowing controls for everything and logging all data into telemetry and FTCDashboard
+ */
 @Config
 @TeleOp
 public class ReadSensors extends LinearOpMode {

@@ -9,11 +9,15 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+/**
+ * Step 3
+ * Implement the PID values and angle/voltage conversions into a (hopefully) successful driving class
+ */
 @Config
 @TeleOp
 public class SwerveMain extends LinearOpMode {
-    static public double L = 12;
-    static public double W = 12;
+    static public double L = 12; //wheelbase
+    static public double W = 12; //trackwidth
     static public DcMotorEx bl;
     static public DcMotorEx br;
     static public DcMotorEx fl;
@@ -85,7 +89,7 @@ public class SwerveMain extends LinearOpMode {
         double d = y + t * (W/R);
 
         // These values range from 0 to 1... we need it to range from -1 to 1
-        double brs = (Math.hypot(a, d) - 0.5) * 2; //TODO: -0.5 * 2
+        double brs = (Math.hypot(a, d) - 0.5) * 2;
         double bls = (Math.hypot(a, c) - 0.5) * 2;
         double frs = (Math.hypot(b, d) - 0.5) * 2;
         double fls = (Math.hypot(b, c) - 0.5) * 2;
