@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 @Config
 @TeleOp
 public class ReadSensors extends LinearOpMode {
-
+    public final double BIG_NUMBA = 0.02757;
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotorEx bl = hardwareMap.get(DcMotorEx.class, "bl");
@@ -72,10 +72,10 @@ public class ReadSensors extends LinearOpMode {
                 frs.setPwmDisable();
             }
 
-            telemetry.addData("back left", bli.getVoltage());
-            telemetry.addData("back right", bri.getVoltage());
-            telemetry.addData("front left", fli.getVoltage());
-            telemetry.addData("front right", fri.getVoltage());
+            telemetry.addData("back left", (bli.getVoltage() / 3.3 * -360)+241.8);
+            telemetry.addData("back right", (bri.getVoltage() / 3.3 * -360)+171.4);
+            telemetry.addData("front left", (fli.getVoltage() / 3.3 * -360)+263.5);
+            telemetry.addData("front right", (fri.getVoltage() / 3.3 * -360)+114);
             telemetry.update();
 
 

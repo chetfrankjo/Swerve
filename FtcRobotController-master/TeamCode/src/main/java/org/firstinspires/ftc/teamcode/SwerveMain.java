@@ -22,8 +22,8 @@ public class SwerveMain extends LinearOpMode {
     static public DcMotorEx br;
     static public DcMotorEx fl;
     static public DcMotorEx fr;
-    public static double p = 0;
-    public static double i = 0;
+    public static double p = 0.01;
+    public static double i = 0.1;
     public static double d = 0;
     static public PIDController blc;
     static public PIDController brc;
@@ -65,6 +65,11 @@ public class SwerveMain extends LinearOpMode {
         fli = hardwareMap.get(AnalogInput.class, "fli");
         fri = hardwareMap.get(AnalogInput.class, "fri");
 
+        blc = new PIDController(p,i,d);
+        brc = new PIDController(p,i,d);
+        flc = new PIDController(p,i,d);
+        frc = new PIDController(p,i,d);
+
         waitForStart();
         while (opModeIsActive()) {
 
@@ -89,10 +94,10 @@ public class SwerveMain extends LinearOpMode {
         double d = y + t * (W/R);
 
         // These values range from 0 to 1... we need it to range from -1 to 1
-        double brs = (Math.hypot(a, d) - 0.5) * 2;
-        double bls = (Math.hypot(a, c) - 0.5) * 2;
-        double frs = (Math.hypot(b, d) - 0.5) * 2;
-        double fls = (Math.hypot(b, c) - 0.5) * 2;
+        double brs = (Math.hypot(a, d));
+        double bls = (Math.hypot(a, c));
+        double frs = (Math.hypot(b, d));
+        double fls = (Math.hypot(b, c));
 
         double bra = (Math.atan2(a, d) / Math.PI) * 180; // added multiplication by 180 to return actual degrees (easier for conversion purposes)
         double bla  = (Math.atan2(a, c) / Math.PI) * 180;
@@ -109,7 +114,7 @@ public class SwerveMain extends LinearOpMode {
     public static void setMotorSpeeds(double brs, double bls, double frs, double fls) {
         br.setPower(brs);
         bl.setPower(bls);
-        fr.setPower(frs);
+        //fr.setPower(frs);
         fl.setPower(fls);
     }
 
@@ -123,7 +128,10 @@ public class SwerveMain extends LinearOpMode {
 
         //TODO: "wrap" the angle back when the range exceeds possibility
 
-        bls.setPower(blc.calculate(bli.getVoltage(), bla));
+        bls.setPower(blc.calculate((bli.getVoltage() / 3.3 * -360)+263.5, bla));
+        brs.setPower(brc.calculate((bri.getVoltage() / 3.3 * -360)+171.4, bra));
+        //frs.setPower(frc.calculate((fli.getVoltage() / 3.3 * -360)+263.5, fra));
+        fls.setPower(flc.calculate((fri.getVoltage() / 3.3 * -360)+114, fla));
 
     }
 
