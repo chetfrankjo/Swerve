@@ -37,6 +37,11 @@ public class SwerveMain extends LinearOpMode {
     public static AnalogInput bri;
     public static AnalogInput fli;
     public static AnalogInput fri;
+    public static double BL_OFFSET;
+    public static double BR_OFFSET;
+    public static double FL_OFFSET;
+    public static double FR_OFFSET;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -70,12 +75,17 @@ public class SwerveMain extends LinearOpMode {
         flc = new PIDController(p,i,d);
         frc = new PIDController(p,i,d);
 
+        //store forward offsets
+        BL_OFFSET = bli.getVoltage() * 3.3 / -360;
+        BR_OFFSET = bri.getVoltage() * 3.3 / -360;
+        FL_OFFSET = fli.getVoltage() * 3.3 / -360;
+        FR_OFFSET = fri.getVoltage() * 3.3 / -360;
+
         waitForStart();
         while (opModeIsActive()) {
 
-            //do swerve stuff
-
-            double val = drive(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x);
+            //TODO: make gamepad input not negative?
+            double val = drive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
 
             telemetry.addData("targetAngle", val);
             telemetry.update();
@@ -93,16 +103,46 @@ public class SwerveMain extends LinearOpMode {
         double c = y - t * (W/R);
         double d = y + t * (W/R);
 
-        // These values range from 0 to 1... we need it to range from -1 to 1
+
         double brs = (Math.hypot(a, d));
         double bls = (Math.hypot(a, c));
         double frs = (Math.hypot(b, d));
         double fls = (Math.hypot(b, c));
 
-        double bra = (Math.atan2(a, d) / Math.PI) * 180; // added multiplication by 180 to return actual degrees (easier for conversion purposes)
-        double bla  = (Math.atan2(a, c) / Math.PI) * 180;
-        double fra  = (Math.atan2(b, d) / Math.PI) * 180;
-        double fla  = (Math.atan2(b, c) / Math.PI) * 180;
+        double bra = (Math.atan2(a, d) * 180 / Math.PI); // added multiplication by 180 to return actual degrees (easier for conversion purposes)
+        double bla  = (Math.atan2(a, c) * 180 / Math.PI);
+        double fra  = (Math.atan2(b, d) * 180 / Math.PI);
+        double fla  = (Math.atan2(b, c) * 180 / Math.PI);
+
+        // invert speed to eliminate over-turning of pod
+        if (bra > 90) {
+            bra = bra - 180;
+            brs = -brs;
+        } else if (bra < -90) {
+            bra = bra + 180;
+            brs = -brs;
+        }
+        if (bla > 90) {
+            bla = bla - 180;
+            bls = -bls;
+        } else if (bra < -90) {
+            bls = bla + 180;
+            bls = -bls;
+        }
+        if (fra > 90) {
+            fra = bra - 180;
+            frs = -frs;
+        } else if (fra < -90) {
+            fra = fra + 180;
+            frs = -frs;
+        }
+        if (fla > 90) {
+            fla = fla - 180;
+            fls = -fls;
+        } else if (fla < -90) {
+            fla = fla + 180;
+            fls = -fls;
+        }
 
 
         setMotorSpeeds(brs, bls, frs, fls);
@@ -114,7 +154,7 @@ public class SwerveMain extends LinearOpMode {
     public static void setMotorSpeeds(double brs, double bls, double frs, double fls) {
         br.setPower(brs);
         bl.setPower(bls);
-        //fr.setPower(frs);
+        fr.setPower(frs);
         fl.setPower(fls);
     }
 
@@ -124,15 +164,13 @@ public class SwerveMain extends LinearOpMode {
         frc.setPID(p, i, d);
         flc.setPID(p, i, d);
 
-        //TODO: do conversion from target angle to analog val
-
         //TODO: "wrap" the angle back when the range exceeds possibility
+        //      This seems to be done "automatically" for the most part... TBD
 
-        bls.setPower(blc.calculate((bli.getVoltage() / 3.3 * -360)+263.5, bla));
-        brs.setPower(brc.calculate((bri.getVoltage() / 3.3 * -360)+171.4, bra));
-        //frs.setPower(frc.calculate((fli.getVoltage() / 3.3 * -360)+263.5, fra));
-        fls.setPower(flc.calculate((fri.getVoltage() / 3.3 * -360)+114, fla));
-
+        bls.setPower(blc.calculate((bli.getVoltage() / 3.3 * -360)-BL_OFFSET, bla));
+        brs.setPower(brc.calculate((bri.getVoltage() / 3.3 * -360)-BR_OFFSET, bra));
+        frs.setPower(frc.calculate((fli.getVoltage() / 3.3 * -360)-FR_OFFSET, fra));
+        fls.setPower(flc.calculate((fri.getVoltage() / 3.3 * -360)-FL_OFFSET, fla));
     }
 
 
