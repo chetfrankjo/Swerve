@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import org.firstinspires.ftc.teamcode.AbsoluteAnalogEncoder;
+
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -38,10 +40,12 @@ public class ReadSensors extends LinearOpMode {
         CRServoImplEx fls = hardwareMap.get(CRServoImplEx.class, "fls");
         CRServoImplEx frs = hardwareMap.get(CRServoImplEx.class, "frs");
 
-        AnalogInput bli = hardwareMap.get(AnalogInput.class, "bli");
-        AnalogInput bri = hardwareMap.get(AnalogInput.class, "bri");
-        AnalogInput fli = hardwareMap.get(AnalogInput.class, "fli");
-        AnalogInput fri = hardwareMap.get(AnalogInput.class, "fri");
+
+
+        AbsoluteAnalogEncoder bli = new AbsoluteAnalogEncoder(hardwareMap.get(AnalogInput.class, "bli"), 3.3);
+        AbsoluteAnalogEncoder bri = new AbsoluteAnalogEncoder(hardwareMap.get(AnalogInput.class, "bri"), 3.3);
+        AbsoluteAnalogEncoder fli = new AbsoluteAnalogEncoder(hardwareMap.get(AnalogInput.class, "fli"), 3.3);
+        AbsoluteAnalogEncoder fri = new AbsoluteAnalogEncoder(hardwareMap.get(AnalogInput.class, "fri"), 3.3);
         waitForStart();
 
         while (opModeIsActive()) {
@@ -72,10 +76,10 @@ public class ReadSensors extends LinearOpMode {
                 frs.setPwmDisable();
             }
 
-            telemetry.addData("back left", (bli.getVoltage() / 3.3 * -360)+241.8);
-            telemetry.addData("back right", (bri.getVoltage() / 3.3 * -360)+171.4);
-            telemetry.addData("front left", (fli.getVoltage() / 3.3 * -360)+263.5);
-            telemetry.addData("front right", (fri.getVoltage() / 3.3 * -360)+114);
+            telemetry.addData("back left", bli.getCurrentPosition());
+            telemetry.addData("back right", bri.getCurrentPosition());
+            telemetry.addData("front left", fli.getCurrentPosition());
+            telemetry.addData("front right", fri.getCurrentPosition());
             telemetry.update();
 
 
