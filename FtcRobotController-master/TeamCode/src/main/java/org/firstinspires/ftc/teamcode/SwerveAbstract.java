@@ -2,8 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.util.MathUtils;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.AbsoluteAnalogEncoder;
 import org.opencv.core.Mat;
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -11,6 +14,8 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.IMU;
+
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 
 
@@ -63,6 +68,10 @@ public class SwerveAbstract extends LinearOpMode {
         PIDController flc = new PIDController(p,i,di);
         PIDController frc = new PIDController(p,i,di);
 
+        IMU imu = hardwareMap.get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.LEFT)));
+        imu.resetYaw();
+
         waitForStart();
 
         while (opModeIsActive()) {
@@ -71,6 +80,18 @@ public class SwerveAbstract extends LinearOpMode {
             double x = -gamepad1.left_stick_x;
             double y = gamepad1.left_stick_y;
             double t = -gamepad1.right_stick_x;
+
+            //SuperMegaDrive
+            /*double head = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            double relativeXToPoint = Math.cos(Math.toRadians(90)-Math.toRadians(head));
+            double relativeYToPoint = Math.sin(Math.toRadians(90)-Math.toRadians(head));
+
+            double movementXPower = relativeXToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
+            double movementYPower = relativeYToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
+            x = (movementXPower*y)+(movementYPower*x);
+            y = (movementYPower*-y)+(movementXPower*x);
+
+             */
 
             double R = Math.hypot(L, W);
 
@@ -147,8 +168,8 @@ public class SwerveAbstract extends LinearOpMode {
 
             double blPower = (blOptimized[1]);
             double brPower = (-brOptimized[1]);
-            double flPower = (-flOptimized[1]);
-            double frPower = (frOptimized[1]);
+            double flPower = (flOptimized[1]);
+            double frPower = (-frOptimized[1]);
 
             bl.setPower(blPower);
             br.setPower(brPower);
