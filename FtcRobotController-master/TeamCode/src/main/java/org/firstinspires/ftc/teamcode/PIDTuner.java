@@ -33,7 +33,7 @@ public class PIDTuner extends LinearOpMode {
         CRServo fls = hardwareMap.get(CRServo.class, "fls");
         CRServo frs = hardwareMap.get(CRServo.class, "frs");
 
-        AnalogInput bli = hardwareMap.get(AnalogInput.class, "bli");
+        AbsoluteAnalogEncoder bli = new AbsoluteAnalogEncoder(hardwareMap.get(AnalogInput.class, "bli"), 3.3).zero(5.068);
         AnalogInput bri = hardwareMap.get(AnalogInput.class, "bri");
         AnalogInput fli = hardwareMap.get(AnalogInput.class, "fli");
         AnalogInput fri = hardwareMap.get(AnalogInput.class, "fri");
@@ -55,22 +55,35 @@ public class PIDTuner extends LinearOpMode {
             frc.setPID(p,i,di);
 
             // TODO: convert target to voltage target (from step 1)
-            bls.setPower((targetAngle - (bli.getVoltage() / 3.3 * -360)+245) * p);
-            //bls.setPower(-blc.calculate((bli.getVoltage() / 3.3 * -360)+245, targetAngle));
+            //bls.setPower((targetAngle - (bli.getVoltage() / 3.3 * -360)+245) * p);
+            bls.setPower(blc.calculate(convertTo180(bli.getCurrentPosition()), targetAngle));
             //brs.setPower(-brc.calculate((bri.getVoltage() / 3.3 * -360)+172, targetAngle));
             //fls.setPower(flc.calculate((fli.getVoltage() / 3.3 * -360)+82.8,targetAngle));
             //frs.setPower(frc.calculate((fri.getVoltage() / 3.3 * -360)+110.0, targetAngle));
 
-            telemetry.addData("input", (bli.getVoltage() / 3.3 * -360)+245);
+            telemetry.addData("input", convertTo180(bli.getCurrentPosition()));
             telemetry.update();
 
 
             TelemetryPacket packet = new TelemetryPacket();
 
-            packet.put("input",(bli.getVoltage() / 3.3 * -360)+245);
+            packet.put("input",convertTo180(bli.getCurrentPosition()));
             packet.put("tager", targetAngle);
             dashboard.sendTelemetryPacket(packet);
 
         }
     }
+
+    public static double convertTo180(double degrees) {
+        if (degrees > 180) {
+            // Subtract 360 from degrees greater than 180 to bring them into the -180 to 180 range
+            degrees -= 360;
+        }
+
+        // Make sure degrees are still in the -180 to 180 range
+        degrees %= 360;
+
+        return degrees;
+    }
+
 }
